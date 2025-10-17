@@ -24,8 +24,13 @@ RUN if [ ! -f .env ]; then cp .env.example .env; fi \
     && npm run build \
     && php artisan key:generate
 
+# Copia lo script di avvio che prepara il database
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Espone la porta usata da Laravel
 EXPOSE 8000
 
 # Comando per avviare Laravel
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
