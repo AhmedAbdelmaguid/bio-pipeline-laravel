@@ -16,13 +16,12 @@ WORKDIR /app
 # Copia i file del progetto
 COPY . .
 
-# Installa le dipendenze di Laravel
-# Crea un file .env di base se assente per consentire a artisan di generare la chiave
+# Installa le dipendenze di Laravel e compila gli asset
+# Crea un file .env di base se assente per consentire alle installazioni di completarsi
 RUN if [ ! -f .env ]; then cp .env.example .env; fi \
     && composer install \
     && npm install \
-    && npm run build \
-    && php artisan key:generate
+    && npm run build
 
 # Copia lo script di avvio che prepara il database
 COPY docker-entrypoint.sh /entrypoint.sh

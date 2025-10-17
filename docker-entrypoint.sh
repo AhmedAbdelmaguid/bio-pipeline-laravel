@@ -18,11 +18,18 @@ if [ "${DB_CONNECTION}" = "sqlite" ] || [ -z "${DB_CONNECTION}" ]; then
   if [ ! -f "${DB_PATH}" ]; then
     touch "${DB_PATH}"
   fi
-
-  php artisan migrate --force || {
-    echo "Failed to run migrations against ${DB_PATH}" >&2
-    exit 1
-  }
 fi
+
+# Generate the application key if not provided via environment/.env
+if [ -z "${APP_KEY}" ]; then
+  if ! grep -Eq '^APP_KEY=.+$' /app/.env 2>/dev/null; then
+    php artisan key:generate --force
+  fi
+fi
+
+# Run migrations, refresh storage symlink, and clear caches
+php artisan migrate --force
+php artisan storage:link --force
+php artisan optimize:clear
 
 exec "$@"
