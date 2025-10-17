@@ -1,0 +1,58 @@
+*** Begin Patch
+*** Update File: resources/views/projects/show.blade.php
+@@
+-                findConnectedModules(blockId) {
+-                    const connectedModules = [];
+-                    
+-                    // Cerca collegamenti in uscita dal blocco
+-                    const outgoingLinks = this.links.filter(link => link.from.blockId === blockId);
+-                    
+-                    outgoingLinks.forEach(link => {
+-                        const targetBlock = this.blocks.find(b => b.id === link.to.blockId);
+-                        if (targetBlock && targetBlock.kind === 'module') {
+-                            connectedModules.push({
+-                                block: targetBlock,
+-                                module: this.modules.find(m => m.id === targetBlock.moduleId),
+-                                link: link
+-                            });
+-                        }
+-                    });
+-                    
+-                    return connectedModules;
+-                },
++                findConnectedModules(startBlockId) {
++                    const visited = new Set();
++                    const queue = [{ nodeId: startBlockId }];
++                    const results = [];
++
++                    while (queue.length) {
++                        const current = queue.shift();
++                        const nodeId = current.nodeId;
++
++                        if (visited.has(nodeId)) continue;
++                        visited.add(nodeId);
++
++                        const outgoing = this.links.filter(link => link.from.blockId === nodeId);
++
++                        outgoing.forEach(link => {
++                            const targetBlock = this.blocks.find(b => b.id === link.to.blockId);
++                            if (!targetBlock) return;
++
++                            if (targetBlock.kind === 'module') {
++                                const module = this.modules.find(m => m.id === targetBlock.moduleId);
++                                results.push({
++                                    block: targetBlock,
++                                    module,
++                                    link,
++                                });
++                            }
++
++                            if (!visited.has(targetBlock.id)) {
++                                queue.push({ nodeId: targetBlock.id });
++                            }
++                        });
++                    }
++
++                    return results;
++                },
+*** End Patch
