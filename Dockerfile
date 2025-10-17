@@ -17,7 +17,12 @@ WORKDIR /app
 COPY . .
 
 # Installa le dipendenze di Laravel
-RUN composer install && npm install && npm run build && php artisan key:generate
+# Crea un file .env di base se assente per consentire a artisan di generare la chiave
+RUN if [ ! -f .env ]; then cp .env.example .env; fi \
+    && composer install \
+    && npm install \
+    && npm run build \
+    && php artisan key:generate
 
 # Espone la porta usata da Laravel
 EXPOSE 8000
