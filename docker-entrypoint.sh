@@ -27,6 +27,16 @@ if [ -z "${APP_KEY}" ]; then
   fi
 fi
 
+# Export the key so Laravel sees it even if the hosting platform injects an empty APP_KEY
+if [ -z "${APP_KEY}" ]; then
+  if KEY_LINE=$(grep -E '^APP_KEY=' /app/.env 2>/dev/null | head -n 1); then
+    KEY_VALUE=$(printf '%s' "${KEY_LINE#APP_KEY=}" | tr -d '\r')
+    if [ -n "${KEY_VALUE}" ]; then
+      export APP_KEY="${KEY_VALUE}"
+    fi
+  fi
+fi
+
 # Run migrations, refresh storage symlink, and clear caches
 php artisan migrate --force
 php artisan storage:link --force
