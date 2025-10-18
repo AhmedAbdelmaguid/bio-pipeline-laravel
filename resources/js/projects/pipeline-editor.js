@@ -779,7 +779,7 @@ document.addEventListener('alpine:init', () => {
                         name: "Transcript-level Abundance pipeline (Human GRCh38)",
                         description: "The pipeline concerns the transcript-level expression analysis of RNA-seq experiments based on the Pertea et al. (2016) study.",
                         author: "Ahmed Abdelmaguid",
-                        url: "https://github.com/ahmedsarwat27",
+                        url: "https://github.com/AhmedAbdelmaguid",
                         help: "Helpful information for configuring and/or interpreting input, output, and parameters of interest should be provided here.",
                         pipeline: hierarchy
                     };
