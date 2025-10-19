@@ -3,71 +3,52 @@ set -e
 
 cd /app
 
-run_artisan() {
-  php -d variables_order=EGPCS artisan "$@"
-}
-
-ensure_env_file() {
-  if [ ! -f .env ] && [ -f .env.example ]; then
-    cp .env.example .env
-  fi
-}
-
-write_app_key() {
-  KEY_VALUE="$1"
-  if [ -f .env ]; then
-    awk -v key="${KEY_VALUE}" 'BEGIN{updated=0} /^APP_KEY=/{print "APP_KEY=" key; updated=1; next} {print} END{if(updated==0) print "APP_KEY=" key}' .env > .env.tmp \
-      && mv .env.tmp .env
-  else
-    printf 'APP_KEY=%s\n' "${KEY_VALUE}" > .env
-  fi
-}
-
-ensure_app_key() {
-  if [ -n "${APP_KEY}" ]; then
-    write_app_key "${APP_KEY}"
-    return
-  fi
-
-  CURRENT_KEY=""
-  if [ -f .env ]; then
-    CURRENT_KEY=$(grep -E '^APP_KEY=' .env 2>/dev/null | head -n 1 | cut -d= -f2- | tr -d '\r')
-  fi
-
-  if [ -z "${CURRENT_KEY}" ]; then
-    CURRENT_KEY=$(php -r "echo 'base64:'.base64_encode(random_bytes(32));")
-    if [ -z "${CURRENT_KEY}" ]; then
-      echo "Failed to generate APP_KEY" >&2
-      exit 1
-    fi
-    write_app_key "${CURRENT_KEY}"
-  fi
-
-  export APP_KEY="${CURRENT_KEY}"
-}
-
-prepare_sqlite() {
-  if [ "${DB_CONNECTION}" = "sqlite" ] || [ -z "${DB_CONNECTION}" ]; then
-    DB_PATH="${DB_DATABASE:-/app/database/database.sqlite}"
-    DB_DIR="$(dirname "${DB_PATH}")"
-    [ -d "${DB_DIR}" ] || mkdir -p "${DB_DIR}"
-    [ -f "${DB_PATH}" ] || touch "${DB_PATH}"
-  fi
-}
-
-# Clear caches from previous runs (ignore failures if the key is missing yet)
-run_artisan optimize:clear || true
+# Rimuovi eventuale config cache "sporca"
 rm -f bootstrap/cache/config.php || true
 
-ensure_env_file
-ensure_app_key
-prepare_sqlite
+# Crea .env se manca
+if [ ! -f .env ] && [ -f .env.example ]; then
+  cp .env.example .env
+fi
 
-# Run essential Artisan tasks, allowing the container to continue even if they fail
-run_artisan migrate --force || true
-run_artisan storage:link --force || true
-run_artisan config:clear || true
-run_artisan route:clear || true
-run_artisan view:clear || true
+# APP_KEY: se arriva da ENV, scrivila dentro .env (portabile senza bash)
+if [ -n "$APP_KEY" ]; then
+  awk -v v="$APP_KEY" '
+    BEGIN{done=0}
+    /^APP_KEY=/{print "APP_KEY=" v; done=1; next}
+    {print}
+    END{if(!done) print "APP_KEY=" v}
+  ' .env > .env.new && mv .env.new .env
+else
+  if ! grep -Eq '^APP_KEY=.+$' .env 2>/dev/null; then
+    php -d variables_order=EGPCS artisan key:generate --force
+  fi
+  KEY_LINE=$(grep -E '^APP_KEY=' .env 2>/dev/null | head -n1 || true)
+  KEY_VALUE=$(printf '%s' "${KEY_LINE#APP_KEY=}" | tr -d '\r')
+  if [ -n "$KEY_VALUE" ]; then export APP_KEY="$KEY_VALUE"; fi
+fi
+
+# Prepara SQLite PRIMA di toccare la cache
+if [ "${DB_CONNECTION}" = "sqlite" ] || [ -z "${DB_CONNECTION}" ]; then
+  DB_PATH="${DB_DATABASE:-/app/database/database.sqlite}"
+  DB_DIR="$(dirname "${DB_PATH}")"
+  [ -d "$DB_DIR" ] || mkdir -p "$DB_DIR"
+  [ -f "$DB_PATH" ] || : > "$DB_PATH"
+fi
+
+# Permessi per storage/cache e db
+chmod -R ug+rwX storage bootstrap/cache || true
+[ -n "$DB_PATH" ] && [ -f "$DB_PATH" ] && chmod 664 "$DB_PATH" || true
+
+# Pulisci cache forzando driver file (evita DB durante i clear)
+export CACHE_DRIVER=${CACHE_DRIVER:-file}
+php -d variables_order=EGPCS artisan config:clear || true
+php -d variables_order=EGPCS artisan route:clear  || true
+php -d variables_order=EGPCS artisan view:clear   || true
+php -d variables_order=EGPCS artisan cache:clear  || true
+
+# Migrazioni e symlink storage (fallire deve mostrare l'errore)
+php -d variables_order=EGPCS artisan migrate --force
+php -d variables_order=EGPCS artisan storage:link --force
 
 exec "$@"
