@@ -1,5 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
+<<<<<<< HEAD
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
                 <p class="text-xs uppercase tracking-[0.3em] text-indigo-600">Profilo e sicurezza</p>
@@ -15,10 +16,21 @@
     <div class="max-w-6xl mx-auto px-6 py-8 space-y-6">
         @if (session('status'))
             <div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 px-4 py-3 text-sm shadow-sm">
+=======
+        <h2 class="font-semibold text-xl">Profilo Utente</h2>
+    </x-slot>
+
+    <div class="max-w-xl mx-auto py-8 px-6 space-y-8">
+
+        {{-- Messaggio di successo --}}
+        @if (session('status'))
+            <div class="p-3 bg-green-100 border rounded text-green-800">
+>>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                 {{ session('status') }}
             </div>
         @endif
 
+<<<<<<< HEAD
         <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
             <div class="bg-white rounded-2xl shadow-md border border-slate-100 p-6 space-y-5">
                 <div class="flex items-center gap-3">
@@ -115,5 +127,42 @@
                 </form>
             </div>
         </div>
+=======
+        {{-- Form aggiornamento profilo --}}
+        <form method="POST" action="{{ route('profile.update') }}" class="space-y-4">
+            @csrf
+            @method('PATCH')
+
+            <div>
+                <label class="block text-sm font-medium">Nome utente</label>
+                <input name="name" type="text" value="{{ old('name', $user->name) }}"
+                    class="w-full mt-1 border rounded-lg p-2">
+                @error('name') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium">Nuova password (opzionale)</label>
+                <input name="password" type="password" class="w-full mt-1 border rounded-lg p-2">
+                @error('password') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium">Conferma password</label>
+                <input name="password_confirmation" type="password" class="w-full mt-1 border rounded-lg p-2">
+            </div>
+
+            <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                Aggiorna profilo
+            </button>
+        </form>
+
+        {{-- Form eliminazione account --}}
+        <form method="POST" action="{{ route('profile.destroy') }}"
+              onsubmit="return confirm('Sei sicuro di voler eliminare definitivamente l’account?')">
+            @csrf
+            @method('DELETE')
+            <button class="text-red-600 underline">Elimina account</button>
+        </form>
+>>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
     </div>
 </x-app-layout>

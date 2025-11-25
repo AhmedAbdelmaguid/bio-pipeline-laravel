@@ -30,6 +30,7 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
 }
+<<<<<<< HEAD
 
 .node-card {
     box-shadow: 0 12px 30px -18px rgba(79, 70, 229, 0.4);
@@ -60,3 +61,5 @@
     background: #f59e0b;
     box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.18);
 }
+=======
+>>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
