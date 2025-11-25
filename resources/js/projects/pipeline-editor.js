@@ -45,13 +45,8 @@ document.addEventListener('alpine:init', () => {
                 })),
 
                 // ui
-<<<<<<< HEAD
                 workspaceWidth: 1600,
                 workspaceHeight: 1200,
-=======
-                workspaceWidth: 2400,
-                workspaceHeight: 1600,
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                 viewportScale: 1,
                 viewportMinScale: 0.5,
                 viewportMaxScale: 2,
@@ -73,7 +68,6 @@ document.addEventListener('alpine:init', () => {
                 connectFrom: null,
                 tempLine: null,
                 jsonText: '',
-<<<<<<< HEAD
                 isSaving: false,
                 statusMessage: '',
                 lastSavedAt: opts.lastSavedAt ? new Date(opts.lastSavedAt) : null,
@@ -93,52 +87,14 @@ document.addEventListener('alpine:init', () => {
 
                     this.$nextTick(() => {
                         setTimeout(() => this.refreshLinkPositions(), 200);
-=======
-
-                init() {
-                    this.initializeBlocks();
-                    this.syncJson();
-
-                    this.$nextTick(() => {
-                        setTimeout(() => {
-                            this.refreshLinkPositions();
-                            setTimeout(() => {
-                                this.refreshLinkPositions();
-                                setTimeout(() => {
-                                    this.refreshLinkPositions();
-
-                                }, 500);
-                            }, 300);
-                        }, 200);
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                     });
 
                     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
                     window.addEventListener('mouseup', () => this.stopDragging());
                     window.addEventListener('resize', () => this.refreshLinkPositions());
 
-<<<<<<< HEAD
                     // MutationObserver rimosso per evitare refresh continui
                     this.initializing = false;
-=======
-                    if (typeof MutationObserver !== 'undefined') {
-                        const observer = new MutationObserver(() => {
-                            this.refreshLinkPositions();
-                        });
-
-                        this.$nextTick(() => {
-                            const canvas = this.$refs.canvas;
-                            if (canvas) {
-                                observer.observe(canvas, { 
-                                    childList: true, 
-                                    subtree: true,
-                                    attributes: true,
-                                    attributeFilter: ['style', 'class', 'data-id']
-                                });
-                            }
-                        });
-                    }
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                 },
 
                 defaultBlockConfig() {
@@ -162,11 +118,7 @@ document.addEventListener('alpine:init', () => {
                     };
                 },
 
-<<<<<<< HEAD
                 initializeBlocks(skipAuto = false) {
-=======
-                initializeBlocks() {
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                     if (!this.blocks.length) {
                         this.blocks.push(this.defaultBlockConfig());
                     }
@@ -226,11 +178,7 @@ document.addEventListener('alpine:init', () => {
                     }
 
                     this.updateBlockCounter();
-<<<<<<< HEAD
                     this.syncJson(skipAuto);
-=======
-                    this.syncJson();
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                 },
 
                 parseBlockIndex(title) {
@@ -504,10 +452,6 @@ document.addEventListener('alpine:init', () => {
                             b.x = Math.max(0, Math.min(maxX, x)); 
                             b.y = Math.max(0, Math.min(maxY, y)); 
                             this.refreshLinkPositions();
-<<<<<<< HEAD
-=======
-                            this.syncJson();
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                         }
                     } else if (this.connectFrom && this.tempLine && container) {
                         const rect = container.getBoundingClientRect();
@@ -703,7 +647,6 @@ document.addEventListener('alpine:init', () => {
                     };
                 },
 
-<<<<<<< HEAD
                 syncJson(skipAuto = false) {
                     this.jsonText = JSON.stringify(this.snapshot(), null, 2);
                     this.warnings = this.computeWarnings();
@@ -790,10 +733,6 @@ document.addEventListener('alpine:init', () => {
                     } catch (e) {
                         return 'Aggiornato';
                     }
-=======
-                syncJson() {
-                    this.jsonText = JSON.stringify(this.snapshot(), null, 2);
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                 },
 
                 formatJson() {
@@ -995,33 +934,11 @@ document.addEventListener('alpine:init', () => {
                 },
 
                 async save() {
-<<<<<<< HEAD
                     if (this.autoSaveTimer) {
                         clearTimeout(this.autoSaveTimer);
                         this.autoSaveTimer = null;
                     }
                     await this.persist(false);
-=======
-                    try {
-                        const payload = this.snapshot();
-                        const res = await fetch(this.saveUrl, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': this.csrf,
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({ metadata: payload })
-                        });
-
-                        if (!res.ok) throw new Error('Save failed');
-                        const j = await res.json();
-                        this.toast('Salvato con successo');
-                    } catch(e) {
-                        console.error('Save error:', e);
-                        this.toast('Errore durante il salvataggio', true);
-                    }
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                 },
 
                 toast(msg, err = false) {
@@ -1057,11 +974,6 @@ document.addEventListener('alpine:init', () => {
 
                     this.$nextTick(() => {
                         this.drawConnections();
-<<<<<<< HEAD
-=======
-                        setTimeout(() => this.drawConnections(), 100);
-                        setTimeout(() => this.drawConnections(), 500);
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                     });
                 },
 
@@ -1247,7 +1159,6 @@ document.addEventListener('alpine:init', () => {
                 },
 
                 handleWheel(event) {
-<<<<<<< HEAD
                     return; // disabilitato per evitare blocchi
                 },
 
@@ -1291,17 +1202,6 @@ document.addEventListener('alpine:init', () => {
                         const cmdMatch = (m.commands || []).some(c => (c || '').toLowerCase().includes(term));
                         return titleMatch || cmdMatch;
                     });
-=======
-                    if (!event.ctrlKey) return;
-                    event.preventDefault();
-                    const container = this.$refs.canvas;
-                    if (!container) return;
-                    const rect = container.getBoundingClientRect();
-                    const anchorX = event.clientX - rect.left;
-                    const anchorY = event.clientY - rect.top;
-                    const direction = event.deltaY > 0 ? -1 : 1;
-                    this.setScale(this.viewportScale + direction * this.viewportStep, anchorX, anchorY);
->>>>>>> 15b321123c3bf3521facdc510f95c4703692d959
                 }
             }));
         });
