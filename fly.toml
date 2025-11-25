@@ -9,14 +9,14 @@ primary_region = "fra"
   APP_DEBUG = "false"
   APP_URL = "https://bio-pipeline-laravel.fly.dev"
   DB_CONNECTION = "sqlite"
-  DB_DATABASE = "/app/database/database.sqlite"
+  DB_DATABASE = "/app/storage/db/database.sqlite"
   CACHE_DRIVER = "file"
   SESSION_DRIVER = "file"
   QUEUE_CONNECTION = "database"
 
 [mounts]
   source = "data"
-  destination = "/app/database"
+  destination = "/app/storage/db"
 
 [[services]]
   internal_port = 8000
