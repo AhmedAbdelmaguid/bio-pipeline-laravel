@@ -1,0 +1,35 @@
+app = "bio-pipeline-laravel"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  APP_ENV = "production"
+  APP_DEBUG = "false"
+  APP_URL = "https://bio-pipeline-laravel.fly.dev"
+  DB_CONNECTION = "sqlite"
+  DB_DATABASE = "/app/database/database.sqlite"
+  CACHE_DRIVER = "file"
+  SESSION_DRIVER = "file"
+  QUEUE_CONNECTION = "database"
+
+[mounts]
+  source = "data"
+  destination = "/app/database"
+
+[[services]]
+  internal_port = 8000
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"

@@ -28,6 +28,14 @@ php artisan serve
 npm run dev
 ```
 
+## Deploy rapido su Fly.io (demo con SQLite)
+- Installa `flyctl` e fai login: `flyctl auth login`.
+- Crea volume per il DB: `flyctl volumes create data --size 1 --region <regione>`.
+- Configura `fly.toml` (già incluso) con `DB_CONNECTION=sqlite` e mount `/app/database`.
+- Imposta i secrets (almeno `APP_KEY`): `flyctl secrets set APP_KEY=$(php -r "echo base64_encode(random_bytes(32));")`.
+- Deploy: `flyctl deploy`.
+- Esegui migrazioni nel container: `flyctl ssh console` → `php artisan migrate --force`.
+
 ## Note su pipeline
 - I workflow sono serializzati in `projects.metadata` (moduli, blocchi, link, parametri, foreach).
 - Avvisi automatici su blocchi non collegati o parametri mancanti; auto-allineamento layout.
