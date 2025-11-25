@@ -28,9 +28,17 @@ else
   if [ -n "$KEY_VALUE" ]; then export APP_KEY="$KEY_VALUE"; fi
 fi
 
+# Prepara percorsi storage/cache prima di tutto
+mkdir -p storage/framework/cache/data \
+         storage/framework/sessions \
+         storage/framework/testing \
+         storage/framework/views \
+         storage/logs \
+         bootstrap/cache
+
 # Prepara SQLite PRIMA di toccare la cache
 if [ "${DB_CONNECTION}" = "sqlite" ] || [ -z "${DB_CONNECTION}" ]; then
-  DB_PATH="${DB_DATABASE:-/app/database/database.sqlite}"
+  DB_PATH="${DB_DATABASE:-/app/storage/db/database.sqlite}"
   DB_DIR="$(dirname "${DB_PATH}")"
   [ -d "$DB_DIR" ] || mkdir -p "$DB_DIR"
   [ -f "$DB_PATH" ] || : > "$DB_PATH"
