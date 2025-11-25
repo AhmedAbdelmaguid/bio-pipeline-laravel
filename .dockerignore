@@ -1,0 +1,12 @@
+.git
+.gitignore
+node_modules
+vendor
+storage/logs
+storage/framework
+storage/app
+bootstrap/cache/*.php
+public/storage
+.env
+*.log
+temp.patch
